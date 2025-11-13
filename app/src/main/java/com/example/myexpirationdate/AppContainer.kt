@@ -2,13 +2,13 @@ package com.example.myexpirationdate
 
 import android.content.Context
 import androidx.room.Room
-import com.example.myexpirationdate.data.ProductDao
+import com.example.myexpirationdate.data.PhotoDao
 import com.example.myexpirationdate.data.MyDatabase
 
 import kotlin.getValue
 
 interface AppContainer {
-    val productDao : ProductDao
+    val photoDao : PhotoDao
 
 }
 
@@ -23,7 +23,7 @@ class DefaultAppContainer(val context: Context) : AppContainer {
             .build()
     }
 
-    override val productDao: ProductDao by lazy{
-        db.productDao
+    override val photoDao: PhotoDao by lazy{
+        db.photoDao
     }
 }

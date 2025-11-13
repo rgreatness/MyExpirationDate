@@ -4,28 +4,24 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.myexpirationdate.models.Product
+import com.example.myexpirationdate.models.Photo
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ProductDao {
+interface PhotoDao {
 
-    // add queries here : examples below
+    @Query("SELECT * FROM photo")
+    fun getAllPhotos(): Flow<List<Photo>>
 
-//     query 1
-    @Query("SELECT * FROM product")
-    fun getAllProduct() : Flow<List<Product>>
+    @Query("SELECT * FROM photo WHERE photo_id IN (:listIds)")
+    fun getPhotoWithIds(listIds: Array<Int>): Flow<List<Photo>>
 
-    @Query("SElECT * FROM product WHERE product_id IN (:listIds)")
-    fun getProductWithIds(listIds: Array<Int>): Flow<List<Product>>
+    @Query("DELETE FROM photo")
+    suspend fun deleteAllPhotos()
 
-
-    // mix of insert and update
-    // Step 8: Enable Upsert
     @Upsert
-    suspend fun upsertProduct(product: Product)
+    suspend fun upsertPhoto(photo: Photo)
 
-    // Step 9: Enable Delete
     @Delete
-    suspend fun deleteProduct(product: Product)
+    suspend fun deletePhoto(photo: Photo)
 }

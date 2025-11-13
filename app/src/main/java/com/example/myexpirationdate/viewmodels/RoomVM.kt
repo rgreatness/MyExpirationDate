@@ -1,3 +1,4 @@
+// Kotlin
 package com.example.myexpirationdate.viewmodels
 
 import androidx.compose.runtime.getValue
@@ -5,101 +6,56 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myexpirationdate.data.DataSource
-import com.example.myexpirationdate.data.ProductDao
+import com.example.myexpirationdate.data.PhotoDao
 import com.example.myexpirationdate.medApp
-import com.example.myexpirationdate.models.Product
+import com.example.myexpirationdate.models.Photo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-// Step 10: Define ProductState to pass to Views
-data class ProductState(
+
+data class PhotoState(
     var id: String = "",
     var name: String = "",
-    var quantity: String = "",
-    var price: String = "",
+    var image: String = ""
 ){
-    fun toProduct() : Product {
-        return Product(
-            product_id = id.toIntOrNull() ?: 1,
+    fun toPhoto(): Photo {
+        return Photo(
+            photo_id = id.toIntOrNull() ?: 0,
             name = name,
-            quantity = quantity.toIntOrNull() ?: 0,
-            unit_price = price.toDoubleOrNull() ?: 0.0
+            imagePath = image
         )
     }
 }
 
-
-//// Step 7: Dependency Injection and create a singleton
 class RoomVM(
-    val productDao : ProductDao,
-) : ViewModel(){
+    val photoDao: PhotoDao,
+) : ViewModel() {
 
-    // Step 8: Import data to Product Table and show them
-    init {
-        importDataToProductTable()
-    }
+    var photo_state by mutableStateOf(PhotoState())
 
-    private fun importDataToProductTable(){
-        viewModelScope.launch {
-            DataSource.listOfProducts.forEach { product ->
-                productDao.upsertProduct(product)
-            }
-        }
-    }
-
-
-    //    // Step 10: Enable Upsert, create a state variable to handle User input
-    var product_state by mutableStateOf(ProductState())
-
-    fun updateProductId(id: String){
-        product_state = product_state.copy(id = id)
-    }
-
-    fun updateProductName(name: String){
-        product_state = product_state.copy(name = name)
-    }
-
-    fun updateProductQuantity(quantity: String){
-        product_state = product_state.copy(quantity = quantity)
-    }
-
-    fun updateProductPrice(price: String){
-        product_state = product_state.copy(price = price)
-    }
-
-
-    // Step 8: show the list of Products
-    //val products = productDao.getAllProduct()
-    val products = productDao.getProductWithIds(arrayOf(2,3))
+    val photos = photoDao.getAllPhotos()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    // Step 9: Enable Delete
-    fun deleteProduct(product: Product){
+    fun deletePhoto(photo: Photo) {
         viewModelScope.launch {
-            productDao.deleteProduct(product)
+            photoDao.deletePhoto(photo)
         }
     }
 
-    //    // Step 10 Enable Upsert to add a new product to the Product Table
-    fun addProduct(){
-        val id = product_state.id.toIntOrNull()
-        if(id != null) {
-            viewModelScope.launch {
-                productDao.upsertProduct(product_state.toProduct())
-            }
+    fun addPhoto() {
+        viewModelScope.launch {
+            photoDao.upsertPhoto(photo_state.toPhoto())
         }
     }
 
-    // Step 7: Create a singleton of the VM and pass the parameters to it from App Container
-    companion object{
-        private var INSTANCE : RoomVM? = null
+    companion object {
+        private var INSTANCE: RoomVM? = null
 
-        fun getInstance() : RoomVM{
-            val vm = INSTANCE ?: synchronized(this){
+        fun getInstance(): RoomVM {
+            val vm = INSTANCE ?: synchronized(this) {
                 RoomVM(
-                    medApp.Companion.getApp().container.productDao,
+                    medApp.Companion.getApp().container.photoDao,
                 ).also {
                     INSTANCE = it
                 }
@@ -107,6 +63,4 @@ class RoomVM(
             return vm
         }
     }
-
 }
-
