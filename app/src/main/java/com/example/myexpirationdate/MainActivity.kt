@@ -266,24 +266,11 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = modifier.fillMaxSize()) {
-        Button(
-            onClick = {
-                coroutineScope.launch {
-                    cameraVM.clearAllPhotos()
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Delete All Photos")
-        }
-
         if (photos.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 Text("No photos taken yet.")
@@ -291,7 +278,7 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 128.dp),
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.weight(1f), // Change this
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(photos) { photo ->
@@ -307,6 +294,20 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
                     }
                 }
             }
+        }
+        Button(
+            onClick = {
+                coroutineScope.launch {
+                    cameraVM.clearAllPhotos()
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Delete All Photos")
         }
     }
 }
