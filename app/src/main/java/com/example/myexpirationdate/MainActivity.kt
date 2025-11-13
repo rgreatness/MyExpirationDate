@@ -38,7 +38,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -53,11 +52,8 @@ val TAG = "MY_TAG"
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Require Permission for Camera Access
-        if (!hasRequiredPermissions()) { // if we don't have this permission
-            ActivityCompat.requestPermissions(
-                this, CAMERAX_PERMISSIONS, 0
-            )
+        if (!hasRequiredPermissions()) {
+            ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
         }
         enableEdgeToEdge()
         setContent {
@@ -77,7 +73,7 @@ class MainActivity : ComponentActivity() {
                         CameraView(
                             context = applicationContext,
                             cameraVM = cameraVM,
-                            onPhotoTaken = { navController.popBackStack() } // Go back after photo is taken
+                            onPhotoTaken = { navController.popBackStack() }
                         )
                     }
                 }
@@ -87,6 +83,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun CameraView(context: Context, cameraVM: CameraVM, onPhotoTaken: () -> Unit) {
+        val lifecycleOwner = LocalLifecycleOwner.current
         val controller = remember {
             LifecycleCameraController(context).apply {
                 setEnabledUseCases(
@@ -95,9 +92,12 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        DisposableEffect(lifecycleOwner) {
+            controller.bindToLifecycle(lifecycleOwner)
+            onDispose {}
+        }
+
+        Box(modifier = Modifier.fillMaxSize()) {
             CameraPreview(controller, modifier = Modifier.fillMaxSize())
 
             IconButton(
@@ -129,7 +129,7 @@ class MainActivity : ComponentActivity() {
                             controller = controller,
                             onPhotoTaken = { bitmap ->
                                 cameraVM.onTakePhoto(bitmap)
-                                onPhotoTaken() // Navigate back
+                                onPhotoTaken()
                             }
                         )
                         Log.i(TAG, "Click on take Photo")
@@ -151,10 +151,11 @@ class MainActivity : ComponentActivity() {
     ) {
         val lifecycleOwner = LocalLifecycleOwner.current
         AndroidView(
-            factory = {
-                PreviewView(it).apply {
+            factory = { ctx ->
+                PreviewView(ctx).apply {
+                    implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                    this.scaleType = PreviewView.ScaleType.FILL_CENTER
                     this.controller = controller
-                    controller.bindToLifecycle(lifecycleOwner)
                 }
             },
             modifier = modifier
@@ -170,20 +171,34 @@ class MainActivity : ComponentActivity() {
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
-                    val matrix = Matrix().apply {
-                        postRotate(image.imageInfo.rotationDegrees.toFloat())
+                    try {
+                        val originalBitmap = imageProxyToBitmap(image)
+                        if (originalBitmap != null) {
+                            val rotationDegrees = image.imageInfo.rotationDegrees
+                            val matrix = Matrix().apply {
+                                if (controller.cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
+                                    preScale(-1f, 1f)
+                                }
+                                postRotate(rotationDegrees.toFloat())
+                            }
+                            val rotatedBitmap = Bitmap.createBitmap(
+                                originalBitmap,
+                                0,
+                                0,
+                                originalBitmap.width,
+                                originalBitmap.height,
+                                matrix,
+                                true
+                            )
+                            onPhotoTaken(rotatedBitmap)
+                        } else {
+                            Log.e(TAG, "Failed to convert ImageProxy to Bitmap")
+                        }
+                    } catch (exc: Exception) {
+                        Log.e(TAG, "Error processing captured image", exc)
+                    } finally {
+                        image.close()
                     }
-                    val rotatedBitmap = Bitmap.createBitmap(
-                        image.toBitmap(),
-                        0,
-                        0,
-                        image.width,
-                        image.height,
-                        matrix,
-                        true
-                    )
-                    onPhotoTaken(rotatedBitmap)
-                    image.close()
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -192,6 +207,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
         )
+    }
+
+    private fun imageProxyToBitmap(image: ImageProxy): Bitmap? {
+        return try {
+            val buffer = image.planes[0].buffer
+            val bytes = ByteArray(buffer.remaining())
+            buffer.get(bytes)
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        } catch (e: Exception) {
+            Log.e(TAG, "imageProxyToBitmap failed", e)
+            null
+        }
     }
 
     private fun hasRequiredPermissions(): Boolean {
@@ -278,7 +305,7 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 128.dp),
-                modifier = Modifier.weight(1f), // Change this
+                modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(photos) { photo ->
