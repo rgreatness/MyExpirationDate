@@ -21,8 +21,7 @@ import java.util.concurrent.TimeUnit
 
 // post https://api.openai.com/v1/chat/completions
 
-const val OPENAI_API_KEY = "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"
-
+const val OPENAI_API_KEY = "put your api key here"
 interface OpenAiApiService {
 
     @Headers(
