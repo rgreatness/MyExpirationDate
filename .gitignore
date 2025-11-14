@@ -14,5 +14,8 @@
 .cxx
 local.properties
 
-ImageBBApi.kt
-OpenAiApi.kt
+# Ignore ImageBB API implementation containing the hardcoded key
+app/src/main/java/com/example/myexpirationdate/apis/ImageBBApi.kt
+
+# Ignore ImageBB API implementation containing the hardcoded key
+app/src/main/java/com/example/myexpirationdate/apis/OpenAiApi.kt
