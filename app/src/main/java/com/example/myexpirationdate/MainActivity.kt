@@ -1,5 +1,7 @@
 package com.example.myexpirationdate
 
+import HomeScreen
+import PhotoGridScreen
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -18,11 +20,7 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -31,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -266,75 +263,6 @@ fun MainScreen(photos: List<Photo>, onTakePhotoClick: () -> Unit) {
                 0 -> HomeScreen(onTakePhotoClick = onTakePhotoClick)
                 1 -> PhotoGridScreen(photos = photos)
             }
-        }
-    }
-}
-
-@Composable
-fun HomeScreen(onTakePhotoClick: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Take a Photo to find its Expiration Date")
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onTakePhotoClick) {
-            Text("Take Photo")
-        }
-    }
-}
-
-@Composable
-fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
-    val cameraVM = viewModel<CameraVM>()
-    val coroutineScope = rememberCoroutineScope()
-
-    Column(modifier = modifier.fillMaxSize()) {
-        if (photos.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No photos taken yet.")
-            }
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 128.dp),
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(4.dp)
-            ) {
-                items(photos) { photo ->
-                    val bitmap = BitmapFactory.decodeFile(photo.imagePath)
-                    bitmap?.let {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = "Captured photo: ${photo.name}",
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .aspectRatio(1f)
-                        )
-                    }
-                }
-            }
-        }
-        Button(
-            onClick = {
-                coroutineScope.launch {
-                    cameraVM.clearAllPhotos()
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Delete All Photos")
         }
     }
 }
