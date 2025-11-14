@@ -79,7 +79,7 @@ object ImageBBApi {
 
         try {
             val resp = retrofitService.uploadBase64(
-                apiKey = "put your own api key here",
+                apiKey = "157effb0ca4f6aadae7005413e85b3c1",
                 base64Image = imageBody,
                 name = nameBody
             )
