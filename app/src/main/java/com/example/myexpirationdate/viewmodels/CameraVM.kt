@@ -1,14 +1,15 @@
 package com.example.myexpirationdate.viewmodels
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myexpirationdate.TAG
 import com.example.myexpirationdate.data.PhotoDao
-import com.example.myexpirationdate.medApp
 import com.example.myexpirationdate.models.Photo
+import com.example.myexpirationdate.repos.ImageRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,7 @@ import java.io.File
 import java.io.FileOutputStream
 import kotlin.coroutines.cancellation.CancellationException
 
-class CameraVM : ViewModel() {
+class CameraVM(application: Application) : AndroidViewModel(application) {
 
     private val _photos = MutableStateFlow<List<Photo>>(emptyList())
     val photos: StateFlow<List<Photo>> = _photos
@@ -28,7 +29,7 @@ class CameraVM : ViewModel() {
     }
 
     private val context: Context by lazy {
-        medApp.getApp().applicationContext
+        getApplication<Application>().applicationContext
     }
 
     init {
@@ -51,25 +52,40 @@ class CameraVM : ViewModel() {
         }
     }
 
-
     fun onTakePhoto(bitmap: Bitmap) {
-        Log.i(TAG, "Photo taken, saving to database")
+        Log.i(TAG, "Photo taken, processing upload/save")
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val fileName = "photo_${System.currentTimeMillis()}.jpg"
-                val file = File(context.filesDir, fileName)
-
-                FileOutputStream(file).use { out ->
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+                val remoteUrl = try {
+                    ImageRepository.uploadAndSave(context, bitmap)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Image upload failed, will save locally", e)
+                    null
                 }
 
-                val photo = Photo(
-                    name = "Photo ${_photos.value.size + 1}",
-                    imagePath = file.absolutePath
-                )
+                if (!remoteUrl.isNullOrEmpty()) {
+                    val photo = Photo(
+                        name = "Photo ${_photos.value.size + 1}",
+                        imagePath = remoteUrl
+                    )
+                    photoDao.upsertPhoto(photo)
+                    Log.d(TAG, "Photo saved with remote URL: $remoteUrl")
+                } else {
+                    val fileName = "photo_${System.currentTimeMillis()}.jpg"
+                    val file = File(context.filesDir, fileName)
 
-                photoDao.upsertPhoto(photo)
-                Log.d(TAG, "Photo saved to ${file.absolutePath}")
+                    FileOutputStream(file).use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+                    }
+
+                    val photo = Photo(
+                        name = "Photo ${_photos.value.size + 1}",
+                        imagePath = file.absolutePath
+                    )
+
+                    photoDao.upsertPhoto(photo)
+                    Log.d(TAG, "Photo saved locally to ${file.absolutePath}")
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Error saving photo", e)
             }
@@ -80,9 +96,9 @@ class CameraVM : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _photos.value.forEach { photo ->
-                    val file = File(photo.imagePath)
-                    if (file.exists()) {
-                        file.delete()
+                    if (photo.imagePath.startsWith(context.filesDir.absolutePath)) {
+                        val file = File(photo.imagePath)
+                        if (file.exists()) file.delete()
                     }
                 }
 
@@ -93,5 +109,4 @@ class CameraVM : ViewModel() {
             }
         }
     }
-
 }

@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- INTERNET permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".medApp"
         android:allowBackup="true"
