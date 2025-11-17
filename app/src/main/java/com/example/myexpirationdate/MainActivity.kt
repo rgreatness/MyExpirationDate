@@ -44,6 +44,11 @@ import com.example.myexpirationdate.screens.ExpirationListScreen
 import com.example.myexpirationdate.ui.theme.MyExpirationDateTheme
 import com.example.myexpirationdate.viewmodels.CameraVM
 import kotlinx.coroutines.launch
+import android.content.Intent
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
 
 val TAG = "MY_TAG"
 
@@ -65,14 +70,7 @@ class MainActivity : ComponentActivity() {
                     composable("main_screen") {
                         MainScreen(
                             photos = photos,
-                            onTakePhotoClick = { navController.navigate("camera_screen") }
-                        )
-                    }
-                    composable("camera_screen") {
-                        CameraView(
-                            context = applicationContext,
                             cameraVM = cameraVM,
-                            onPhotoTaken = { navController.popBackStack() }
                         )
                     }
                     composable("expiration_list_screen") {
@@ -80,146 +78,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-        }
-    }
-
-    @Composable
-    fun CameraView(context: Context, cameraVM: CameraVM, onPhotoTaken: () -> Unit) {
-        val lifecycleOwner = LocalLifecycleOwner.current
-        val controller = remember {
-            LifecycleCameraController(context).apply {
-                setEnabledUseCases(
-                    CameraController.IMAGE_CAPTURE or CameraController.VIDEO_CAPTURE
-                )
-            }
-        }
-
-        DisposableEffect(lifecycleOwner) {
-            controller.bindToLifecycle(lifecycleOwner)
-            onDispose {}
-        }
-
-        Box(modifier = Modifier.fillMaxSize()) {
-            CameraPreview(controller, modifier = Modifier.fillMaxSize())
-
-            IconButton(
-                onClick = {
-                    controller.cameraSelector =
-                        if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
-                            CameraSelector.DEFAULT_FRONT_CAMERA
-                        } else CameraSelector.DEFAULT_BACK_CAMERA
-                },
-                modifier = Modifier
-                    .offset(32.dp, 32.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Cameraswitch,
-                    contentDescription = "Switch Camera"
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                IconButton(
-                    onClick = {
-                        takePhoto(
-                            controller = controller,
-                            onPhotoTaken = { bitmap ->
-                                cameraVM.onTakePhoto(bitmap)
-                                onPhotoTaken()
-                            }
-                        )
-                        Log.i(TAG, "Click on take Photo")
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PhotoCamera,
-                        contentDescription = "Take photo"
-                    )
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun CameraPreview(
-        controller: LifecycleCameraController,
-        modifier: Modifier = Modifier
-    ) {
-        val lifecycleOwner = LocalLifecycleOwner.current
-        AndroidView(
-            factory = { ctx ->
-                PreviewView(ctx).apply {
-                    implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-                    this.scaleType = PreviewView.ScaleType.FILL_CENTER
-                    this.controller = controller
-                }
-            },
-            modifier = modifier
-        )
-    }
-
-    private fun takePhoto(
-        controller: LifecycleCameraController,
-        onPhotoTaken: (Bitmap) -> Unit
-    ) {
-        controller.takePicture(
-            ContextCompat.getMainExecutor(applicationContext),
-            object : ImageCapture.OnImageCapturedCallback() {
-                override fun onCaptureSuccess(image: ImageProxy) {
-                    super.onCaptureSuccess(image)
-                    try {
-                        val originalBitmap = imageProxyToBitmap(image)
-                        if (originalBitmap != null) {
-                            val rotationDegrees = image.imageInfo.rotationDegrees
-                            val matrix = Matrix().apply {
-                                if (controller.cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
-                                    preScale(-1f, 1f)
-                                }
-                                postRotate(rotationDegrees.toFloat())
-                            }
-                            val rotatedBitmap = Bitmap.createBitmap(
-                                originalBitmap,
-                                0,
-                                0,
-                                originalBitmap.width,
-                                originalBitmap.height,
-                                matrix,
-                                true
-                            )
-                            onPhotoTaken(rotatedBitmap)
-                        } else {
-                            Log.e(TAG, "Failed to convert ImageProxy to Bitmap")
-                        }
-                    } catch (exc: Exception) {
-                        Log.e(TAG, "Error processing captured image", exc)
-                    } finally {
-                        image.close()
-                    }
-                }
-
-                override fun onError(exception: ImageCaptureException) {
-                    super.onError(exception)
-                    Log.e("Camera", "Couldn't take photo: ", exception)
-                }
-            }
-        )
-    }
-
-    private fun imageProxyToBitmap(image: ImageProxy): Bitmap? {
-        return try {
-            val buffer = image.planes[0].buffer
-            val bytes = ByteArray(buffer.remaining())
-            buffer.get(bytes)
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-        } catch (e: Exception) {
-            Log.e(TAG, "imageProxyToBitmap failed", e)
-            null
         }
     }
 
@@ -240,7 +98,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(photos: List<Photo>, onTakePhotoClick: () -> Unit) {
+fun MainScreen(photos: List<Photo>, cameraVM: CameraVM) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Home", "Photos", "Expirations")
 
@@ -270,7 +128,7 @@ fun MainScreen(photos: List<Photo>, onTakePhotoClick: () -> Unit) {
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             when (selectedTab) {
-                0 -> HomeScreen(onTakePhotoClick = onTakePhotoClick)
+                0 -> HomeScreen(cameraVM)
                 1 -> PhotoGridScreen(photos = photos)
                 2 -> ExpirationListScreen()
             }
