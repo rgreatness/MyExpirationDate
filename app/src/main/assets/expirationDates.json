@@ -1,0 +1,72 @@
+[
+  {
+    "id": "c2d1f8e4-77a9-4c2b-b51f-8e6c95a4ad01",
+    "product_name": "Canned Beans",
+    "acceptableXdate": {
+      "months": 2,
+      "days": 15
+    },
+    "isDonateable": true,
+    "isUnopened": false
+  },
+  {
+    "id": "9b52bb02-4416-4637-bd55-4d80909e6eca",
+    "product_name": "Pasta",
+    "acceptableXdate": {
+      "months": 6,
+      "days": 0
+    },
+    "isDonateable": true,
+    "isUnopened": false
+  },
+  {
+    "id": "47fa8c93-0b4e-4c7a-8c62-7d896ccab2e9",
+    "product_name": "Milk",
+    "acceptableXdate": {
+      "months": 0,
+      "days": 5
+    },
+    "isDonateable": false,
+    "isUnopened": true
+  },
+  {
+    "id": "f8eab762-4c58-4a2d-9a60-0b7d485e20de",
+    "product_name": "Cereal",
+    "acceptableXdate": {
+      "months": 1,
+      "days": 10
+    },
+    "isDonateable": true,
+    "isUnopened": false
+  },
+  {
+    "id": "e431955e-84f0-4a71-9c51-96a5147b4614",
+    "product_name": "Frozen Vegetables",
+    "acceptableXdate": {
+      "months": 12,
+      "days": 0
+    },
+    "isDonateable": true,
+    "isUnopened": false
+  },
+  {
+    "id": "0b061170-a174-4d12-8deb-7935423ea62b",
+    "product_name": "Yogurt",
+    "acceptableXdate": {
+      "months": 0,
+      "days": 7
+    },
+    "isDonateable": false,
+    "isUnopened": true
+  },
+  {
+    "id": "a91825e7-922f-4c57-9f51-4db9a8a2225d",
+    "product_name": "Ibuprofen (200mg Tablets)",
+    "acceptableXdate": {
+      "months": 6,
+      "days": 0
+    },
+    "isDonateable": true,
+    "isUnopened": true
+  }
+]

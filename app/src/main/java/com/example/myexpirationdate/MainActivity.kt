@@ -22,6 +22,7 @@ import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -39,6 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myexpirationdate.models.Photo
+import com.example.myexpirationdate.screens.ExpirationListScreen
 import com.example.myexpirationdate.ui.theme.MyExpirationDateTheme
 import com.example.myexpirationdate.viewmodels.CameraVM
 import kotlinx.coroutines.launch
@@ -72,6 +74,9 @@ class MainActivity : ComponentActivity() {
                             cameraVM = cameraVM,
                             onPhotoTaken = { navController.popBackStack() }
                         )
+                    }
+                    composable("expiration_list_screen") {
+                        ExpirationListScreen()
                     }
                 }
             }
@@ -237,7 +242,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(photos: List<Photo>, onTakePhotoClick: () -> Unit) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Home", "Photos")
+    val tabs = listOf("Home", "Photos", "Expirations")
 
     Scaffold(
         bottomBar = {
@@ -249,7 +254,12 @@ fun MainScreen(photos: List<Photo>, onTakePhotoClick: () -> Unit) {
                         onClick = { selectedTab = index },
                         icon = {
                             Icon(
-                                imageVector = if (index == 0) Icons.Default.Home else Icons.Default.PhotoLibrary,
+                                imageVector = when (index) {
+                                    0 -> Icons.Default.Home
+                                    1 -> Icons.Default.PhotoLibrary
+                                    2 -> Icons.AutoMirrored.Filled.List
+                                    else -> Icons.Default.Home
+                                },
                                 contentDescription = title
                             )
                         }
@@ -262,6 +272,7 @@ fun MainScreen(photos: List<Photo>, onTakePhotoClick: () -> Unit) {
             when (selectedTab) {
                 0 -> HomeScreen(onTakePhotoClick = onTakePhotoClick)
                 1 -> PhotoGridScreen(photos = photos)
+                2 -> ExpirationListScreen()
             }
         }
     }

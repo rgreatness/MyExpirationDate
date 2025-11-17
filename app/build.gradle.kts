@@ -101,6 +101,10 @@ dependencies {
     // navigation dependency
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    // json dependency
+    implementation("com.google.code.gson:gson:2.10.1")
+
+
 
 
     implementation(libs.androidx.core.ktx)
