@@ -1,72 +1,47 @@
 package com.example.myexpirationdate.viewmodels
 
+import android.graphics.Bitmap
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myexpirationdate.TAG
 import com.example.myexpirationdate.apis.OpenAiApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-
-data class OpenAiState(
-    val question: String? = null,
-    val answer: String? = null
-)
+import java.io.ByteArrayOutputStream
 
 class OpenAiVM : ViewModel() {
 
-    var openAiState: MutableStateFlow<OpenAiState> = MutableStateFlow(OpenAiState())
+    private val _analysisResult = MutableStateFlow("")
+    val analysisResult: StateFlow<String> = _analysisResult.asStateFlow()
 
-    fun updateQuestion(userQuestion: String) {
-        openAiState.update { currentState ->
-            currentState.copy(
-                question = userQuestion
-            )
-        }
-    }
-
-    fun sendRequest() {
-        // TODO: Call the OpenAI api to send the request and get a response
-        val question = openAiState.value.question
-        if (question != null) {
-
-            viewModelScope.launch {
-                try {
-                    val response = OpenAiApi.getResponse(prompt = question)
-                    openAiState.update { currentState ->
-                        currentState.copy(
-                            answer = response
-                        )
-                    }
-
-                } catch (e: Throwable) {
-                    Log.e(TAG, "OpenAiVM: error ${e.printStackTrace()}")
-                }
-            }
-
-        }
-
-
-    }
-
-    fun sendImageRequest(image_url: String) {
-        // TODO:
+    fun analyzeImage(bitmap: Bitmap) {
         viewModelScope.launch {
             try {
-                val response =
-                    OpenAiApi.getImageResponse(prompt = "What is in this image?", image_url)
-                openAiState.update { currentState ->
-                    currentState.copy(
-                        answer = response
-                    )
-                }
+                Log.d(TAG, "Starting image analysis...")
+                val base64Image = bitmapToBase64(bitmap)
+                val dataUrl = "data:image/jpeg;base64,$base64Image"
 
+                val response = OpenAiApi.getImageResponse(
+                    prompt = "What is the food or drug item in this picture?",
+                    imageUrl = dataUrl
+                )
+
+                _analysisResult.value = response
             } catch (e: Throwable) {
-                Log.e(TAG, "OpenAiVM: error ${e.printStackTrace()}")
+                Log.e(TAG, "OpenAiVM.analyzeImage error: ${e.message}", e)
+                _analysisResult.value = "Error analyzing image: ${e.message}"
             }
         }
     }
 
+    private fun bitmapToBase64(bitmap: Bitmap): String {
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos)
+        val bytes = baos.toByteArray()
+        return Base64.encodeToString(bytes, Base64.NO_WRAP)
+    }
 }

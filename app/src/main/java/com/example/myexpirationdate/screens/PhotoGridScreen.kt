@@ -93,7 +93,8 @@ fun PhotoGridScreen(photos: List<com.example.myexpirationdate.models.Photo>, mod
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            enabled = photos.isNotEmpty()
         ) {
             Icon(imageVector = Icons.Default.Delete, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
