@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myexpirationdate.TAG
+import com.example.myexpirationdate.models.parseExpirationItem
 import com.example.myexpirationdate.viewmodels.CameraVM
 import com.example.myexpirationdate.viewmodels.OpenAiVM
 
@@ -73,36 +74,20 @@ fun HomeScreen(
                     style = typography.titleLarge,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                Text(
-                    text = "Name: ${parseField(analysisResult, "name")}",
-                    style = typography.bodyLarge
-                )
-                Text(
-                    text = "Acceptable Date: ${parseField(analysisResult, "acceptableDate")}",
-                    style = typography.bodyLarge
-                )
-                Text(
-                    text = "Donatable: ${parseField(analysisResult, "donatable")}",
-                    style = typography.bodyLarge
-                )
+                Log.d(TAG, "Analysis Result: $analysisResult")
+                val parsed = parseExpirationItem(analysisResult)
+
+                if (parsed != null) {
+                    Text("Name: ${parsed.name}", style = typography.bodyLarge)
+                    Text("Expiration: ${parsed.months} months, ${parsed.days} days", style = typography.bodyLarge)
+                    Text("Donatable: ${parsed.isDonatable}", style = typography.bodyLarge)
+                }
+
             }
         }
 
     }
 }
 
-private fun parseField(result: String, field: String): String {
-    return try {
-        val regex = when (field) {
-            "name" -> """(?:name|product)[:\s]*([^\n,]+)""".toRegex(RegexOption.IGNORE_CASE)
-            "acceptableDate" -> """(?:acceptable[_\s]?date|expir(?:ation|y)[_\s]?date)[:\s]*([^\n,]+)""".toRegex(RegexOption.IGNORE_CASE)
-            "donatable" -> """(?:donatable|can[_\s]?donate)[:\s]*(yes|no|true|false)""".toRegex(RegexOption.IGNORE_CASE)
-            else -> return "N/A"
-        }
-        regex.find(result)?.groupValues?.get(1)?.trim() ?: "N/A"
-    } catch (e: Exception) {
-        "N/A"
-    }
-}
 
 

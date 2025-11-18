@@ -68,26 +68,22 @@ class RoomVM(
                         val jsonObject = jsonArray.getJSONObject(i)
                         val id = jsonObject.getString("id")
                         val name = jsonObject.getString("name")
-                        val isDonateable = jsonObject.getBoolean("isDonateable")
+                        val isDonateable = jsonObject.getBoolean("isDonatable")
                         val isUnopened = jsonObject.getBoolean("isUnopened")
 
-                        val acceptableXdateArray = jsonObject.getJSONArray("acceptableXdate")
-                        val acceptableXdateList = mutableListOf<AcceptableXdate>()
-
-                        for (j in 0 until acceptableXdateArray.length()) {
-                            val xdateObject = acceptableXdateArray.getJSONObject(j)
-                            val months = xdateObject.getInt("months")
-                            val days = xdateObject.getInt("days")
-                            acceptableXdateList.add(AcceptableXdate(months = months, days = days))
-                        }
+                        val xdateObject = jsonObject.getJSONObject("acceptableXdate")
+                        val months = xdateObject.getInt("months")
+                        val days = xdateObject.getInt("days")
+                        val acceptableXdate = AcceptableXdate(months, days)
 
                         val item = ExpirationItem(
                             id = id,
                             name = name,
-                            acceptableXdate = acceptableXdateList,
-                            isDonateable = isDonateable,
+                            acceptableXdate = acceptableXdate,
+                            isDonatable = isDonateable,
                             isUnopened = isUnopened
                         )
+
                         expirationItemDao.insertExpirationItem(item)
                     }
 

@@ -2,97 +2,81 @@
   {
     "id": "c2d1f8e4-77a9-4c2b-b51f-8e6c95a4ad01",
     "name": "Canned Beans",
-    "acceptableXdate": [
-      {
-        "months": 2,
-        "days": 15
-      }
-    ],
-    "isDonateable": true,
+    "acceptableXdate": {
+      "months": 2,
+      "days": 15
+    },
+    "isDonatable": true,
     "isUnopened": false
   },
   {
     "id": "9b52bb02-4416-4637-bd55-4d80909e6eca",
     "name": "Pasta",
-    "acceptableXdate": [
-      {
-        "months": 6,
-        "days": 0
-      }
-    ],
-    "isDonateable": true,
+    "acceptableXdate": {
+      "months": 6,
+      "days": 0
+    },
+    "isDonatable": true,
     "isUnopened": false
   },
   {
     "id": "47fa8c93-0b4e-4c7a-8c62-7d896ccab2e9",
     "name": "Milk",
-    "acceptableXdate": [
-      {
-        "months": 0,
-        "days": 5
-      }
-    ],
-    "isDonateable": false,
+    "acceptableXdate": {
+      "months": 0,
+      "days": 5
+    },
+    "isDonatable": false,
     "isUnopened": true
   },
   {
     "id": "f8eab762-4c58-4a2d-9a60-0b7d485e20de",
     "name": "Cereal",
-    "acceptableXdate": [
-      {
-        "months": 1,
-        "days": 10
-      }
-    ],
-    "isDonateable": true,
+    "acceptableXdate": {
+      "months": 1,
+      "days": 10
+    },
+    "isDonatable": true,
     "isUnopened": false
   },
   {
     "id": "e431955e-84f0-4a71-9c51-96a5147b4614",
     "name": "Frozen Vegetables",
-    "acceptableXdate": [
-      {
-        "months": 12,
-        "days": 0
-      }
-    ],
-    "isDonateable": true,
+    "acceptableXdate": {
+      "months": 12,
+      "days": 0
+    },
+    "isDonatable": true,
     "isUnopened": false
   },
   {
     "id": "0b061170-a174-4d12-8deb-7935423ea62b",
     "name": "Yogurt",
-    "acceptableXdate": [
-      {
-        "months": 0,
-        "days": 7
-      }
-    ],
-    "isDonateable": false,
+    "acceptableXdate": {
+      "months": 0,
+      "days": 7
+    },
+    "isDonatable": false,
     "isUnopened": true
   },
   {
     "id": "a91825e7-922f-4c57-9f51-4db9a8a2225d",
     "name": "Ibuprofen (200mg Tablets)",
-    "acceptableXdate": [
-      {
-        "months": 6,
-        "days": 0
-      }
-    ],
-    "isDonateable": true,
+    "acceptableXdate": {
+      "months": 6,
+      "days": 0
+    },
+    "isDonatable": true,
     "isUnopened": true
   },
   {
     "id": "d3f5c8e2-3b6a-4f9e-8c1a-2e5f4b7c9d3f",
     "name": "Chocolate",
-    "acceptableXdate": [
-      {
-        "months": 5,
-        "days": 0
-      }
-    ],
-    "isDonateable": true,
+    "acceptableXdate": {
+      "months": 5,
+      "days": 0
+    },
+    "isDonatable": true,
     "isUnopened": false
   }
 ]

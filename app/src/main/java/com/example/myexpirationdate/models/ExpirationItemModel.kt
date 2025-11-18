@@ -5,32 +5,31 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 data class AcceptableXdate(
     val months: Int,
     val days: Int
 )
 
-class AcceptableXdateListConverter {
+class AcceptableXdateConverter {
     @TypeConverter
-    fun fromList(value: List<AcceptableXdate>): String {
+    fun fromObject(value: AcceptableXdate): String {
         return Gson().toJson(value)
     }
 
     @TypeConverter
-    fun toList(value: String): List<AcceptableXdate> {
-        val type = object : TypeToken<List<AcceptableXdate>>() {}.type
-        return Gson().fromJson(value, type)
+    fun toObject(value: String): AcceptableXdate {
+        return Gson().fromJson(value, AcceptableXdate::class.java)
     }
 }
 
+
 @Entity(tableName = "expiration_items")
-@TypeConverters(AcceptableXdateListConverter::class)
+@TypeConverters(AcceptableXdateConverter::class)
 data class ExpirationItem(
     @PrimaryKey val id: String,
     val name: String,
-    val acceptableXdate: List<AcceptableXdate>,
-    val isDonateable: Boolean,
+    val acceptableXdate: AcceptableXdate,
+    val isDonatable: Boolean,
     val isUnopened: Boolean
 )
