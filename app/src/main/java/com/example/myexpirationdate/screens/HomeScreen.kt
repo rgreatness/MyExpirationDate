@@ -50,12 +50,13 @@ fun HomeScreen(
         ) { result ->
             val bitmap = result.data?.extras?.get("data") as? Bitmap
             if (bitmap != null) {
-                cameraVM.onTakePhoto(bitmap)
-                openAiVM.analyzeImage(bitmap)
+                openAiVM.analyzeImage(bitmap) // return ParsedItem
+                cameraVM.onTakePhoto(bitmap, null)
             } else {
                 Log.e(TAG, "No bitmap returned from camera intent")
             }
         }
+
 
         val takePictureIntent = remember { Intent(MediaStore.ACTION_IMAGE_CAPTURE) }
         Button(onClick = { launcher.launch(takePictureIntent) }) {

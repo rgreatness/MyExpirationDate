@@ -1,5 +1,8 @@
 package com.example.myexpirationdate.models
 
+import androidx.room.TypeConverter
+import com.google.gson.Gson
+
 data class ParsedItem(
     val name: String,
     val months: Int,

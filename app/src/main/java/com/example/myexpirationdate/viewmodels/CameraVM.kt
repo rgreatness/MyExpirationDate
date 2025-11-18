@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myexpirationdate.TAG
 import com.example.myexpirationdate.data.PhotoDao
+import com.example.myexpirationdate.models.AcceptableXdate
+import com.example.myexpirationdate.models.ParsedItem
 import com.example.myexpirationdate.models.Photo
 import com.example.myexpirationdate.repos.ImageRepository
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +35,7 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
             initialValue = emptyList()
         )
 
-    fun onTakePhoto(bitmap: Bitmap) {
+    fun onTakePhoto(bitmap: Bitmap, parsedItem: ParsedItem? = null) {
         Log.i(TAG, "Photo taken, processing upload")
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -41,8 +43,11 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
 
                 if (remoteUrl != null) {
                     val photo = Photo(
-                        name = "Photo ${photos.value.size + 1}",
-                        imagePath = remoteUrl
+                        name = parsedItem?.name ?: "Photo ${photos.value.size + 1}",
+                        imagePath = remoteUrl,
+                        acceptableXdate = parsedItem?.let { AcceptableXdate(it.months, it.days) }
+                            ?: AcceptableXdate(0, 0),
+                        isDonatable = parsedItem?.isDonatable ?: false
                     )
                     photoDao.upsertPhoto(photo)
                     Log.i(TAG, "Photo saved with remote URL: $remoteUrl")
@@ -54,6 +59,7 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
 
     fun clearAllPhotos() {
         viewModelScope.launch(Dispatchers.IO) {

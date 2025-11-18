@@ -21,6 +21,7 @@ import com.example.myexpirationdate.models.Photo
 import com.example.myexpirationdate.viewmodels.CameraVM
 import kotlinx.coroutines.launch
 import coil3.compose.AsyncImage
+import com.example.myexpirationdate.models.ParsedItem
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -46,6 +47,13 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
             ) {
                 items(photos) { photo ->
 
+                    val parsed = ParsedItem(
+                        name = photo.name,
+                        months = photo.acceptableXdate.months,
+                        days = photo.acceptableXdate.days,
+                        isDonatable = photo.isDonatable
+                    )
+
                     Card(
                         modifier = Modifier.padding(4.dp),
                         shape = RoundedCornerShape(12.dp),
@@ -67,11 +75,16 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
                                     .padding(8.dp)
                             ) {
                                 Text(
-                                    text = photo.name,
+                                    text = parsed.name,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(
-                                    text = "Expiration date here",
+                                    text = "Expiration: ${parsed.months} months, ${parsed.days} days",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = "Donatable: ${parsed.isDonatable}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
