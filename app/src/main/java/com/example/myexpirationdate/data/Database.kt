@@ -9,7 +9,7 @@ import com.example.myexpirationdate.models.Photo
 
 @Database(
     entities = [Photo::class, ExpirationItem::class],
-    version = 4
+    version = 2
 )
 abstract class MyDatabase: RoomDatabase() {
 

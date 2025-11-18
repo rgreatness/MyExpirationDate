@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
 import kotlin.coroutines.cancellation.CancellationException
 
 class CameraVM(application: Application) : AndroidViewModel(application) {
@@ -53,55 +51,33 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
     }
 
     fun onTakePhoto(bitmap: Bitmap) {
-        Log.i(TAG, "Photo taken, processing upload/save")
+        Log.i(TAG, "Photo taken, processing upload")
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val remoteUrl = try {
-                    ImageRepository.uploadAndSave(context, bitmap)
-                } catch (e: Exception) {
-                    Log.w(TAG, "Image upload failed, will save locally", e)
-                    null
-                }
+                val remoteUrl = ImageRepository.uploadAndSave(context, bitmap)
 
-                if (!remoteUrl.isNullOrEmpty()) {
+                if (remoteUrl != null) {
                     val photo = Photo(
                         name = "Photo ${_photos.value.size + 1}",
                         imagePath = remoteUrl
                     )
                     photoDao.upsertPhoto(photo)
-                    Log.d(TAG, "Photo saved with remote URL: $remoteUrl")
+                    Log.i(TAG, "Photo saved with remote URL: $remoteUrl")
                 } else {
-                    val fileName = "photo_${System.currentTimeMillis()}.jpg"
-                    val file = File(context.filesDir, fileName)
-
-                    FileOutputStream(file).use { out ->
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
-                    }
-
-                    val photo = Photo(
-                        name = "Photo ${_photos.value.size + 1}",
-                        imagePath = file.absolutePath
-                    )
-
-                    photoDao.upsertPhoto(photo)
-                    Log.d(TAG, "Photo saved locally to ${file.absolutePath}")
+                    Log.e(TAG, "Failed to upload photo to ImgBB - no URL returned")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error saving photo", e)
+                Log.e(TAG, "Error uploading photo to ImgBB", e)
             }
         }
     }
 
+
+
+
     fun clearAllPhotos() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _photos.value.forEach { photo ->
-                    if (photo.imagePath.startsWith(context.filesDir.absolutePath)) {
-                        val file = File(photo.imagePath)
-                        if (file.exists()) file.delete()
-                    }
-                }
-
                 photoDao.deleteAllPhotos()
                 Log.d(TAG, "All photos cleared")
             } catch (e: Exception) {

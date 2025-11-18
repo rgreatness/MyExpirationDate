@@ -8,5 +8,5 @@ data class Photo(
     @PrimaryKey(autoGenerate = true)
     val photo_id: Int = 0,
     val name: String,
-    val imagePath: String
+    val imagePath: String?
 )

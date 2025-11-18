@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,23 +45,23 @@ fun PhotoGridScreen(photos: List<com.example.myexpirationdate.models.Photo>, mod
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(photos) { photo ->
-                    // produceState will run the loader when `photo.imagePath` changes
                     val bitmapState = produceState<Bitmap?>(initialValue = null, photo.imagePath) {
                         val path = photo.imagePath
                         value = try {
-                            if (path.startsWith("http", ignoreCase = true)) {
-                                // download remote image on IO dispatcher
+                            if (path?.startsWith("http", ignoreCase = true) == true) {
                                 withContext(Dispatchers.IO) {
                                     downloadBitmapFromUrl(path)
                                 }
-                            } else {
-                                // local file decode
+                            } else if (path != null) {
                                 BitmapFactory.decodeFile(path)
+                            } else {
+                                null
                             }
                         } catch (_: Exception) {
                             null
                         }
                     }
+
 
                     Box(
                         modifier = Modifier
@@ -78,7 +77,7 @@ fun PhotoGridScreen(photos: List<com.example.myexpirationdate.models.Photo>, mod
                                 modifier = Modifier.fillMaxSize()
                             )
                         } else {
-                            CircularProgressIndicator()
+                            Text("Image not available" )
                         }
                     }
                 }
@@ -103,7 +102,6 @@ fun PhotoGridScreen(photos: List<com.example.myexpirationdate.models.Photo>, mod
     }
 }
 
-// helper to download a bitmap using OkHttp; returns null on failure
 private fun downloadBitmapFromUrl(url: String): Bitmap? {
     return try {
         val client = OkHttpClient()
