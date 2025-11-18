@@ -20,7 +20,8 @@ import java.util.concurrent.TimeUnit
 
 private const val BASE_URL = "https://api.openai.com/"
 
-private const val OPENAI_API_KEY = "put your api key here"
+private const val OPENAI_API_KEY = "your api key here"
+
 private const val AUTH_HEADER = "Authorization: Bearer $OPENAI_API_KEY"
 
 private val json = Json { ignoreUnknownKeys = true }

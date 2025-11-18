@@ -26,7 +26,11 @@ import com.example.myexpirationdate.viewmodels.CameraVM
 import com.example.myexpirationdate.viewmodels.OpenAiVM
 
 @Composable
-fun HomeScreen(cameraVM: CameraVM, openAiVM: OpenAiVM = viewModel(), modifier: Modifier = Modifier) {
+fun HomeScreen(
+    cameraVM: CameraVM,
+    openAiVM: OpenAiVM = viewModel(),
+    modifier: Modifier = Modifier
+) {
     val analysisResult by openAiVM.analysisResult.collectAsState()
 
     Column(

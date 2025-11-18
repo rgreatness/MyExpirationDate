@@ -2,8 +2,6 @@ package com.example.myexpirationdate
 
 import android.app.Application
 
-// Override the app's onCreate() function
-
 class medApp : Application() {
     lateinit var container : AppContainer
     companion object {
