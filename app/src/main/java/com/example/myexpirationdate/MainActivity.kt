@@ -1,7 +1,6 @@
 package com.example.myexpirationdate
 
 import HomeScreen
-import PhotoGridScreen
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -25,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myexpirationdate.models.Photo
+import com.example.myexpirationdate.screens.PhotoGridScreen
 import com.example.myexpirationdate.ui.theme.MyExpirationDateTheme
 import com.example.myexpirationdate.viewmodels.CameraVM
 import com.example.myexpirationdate.viewmodels.OpenAiVM
