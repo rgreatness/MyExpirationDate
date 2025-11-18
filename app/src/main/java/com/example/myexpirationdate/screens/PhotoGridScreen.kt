@@ -1,31 +1,42 @@
-import kotlinx.coroutines.launch
+package com.example.myexpirationdate.screens
+
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.compose.foundation.Image
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myexpirationdate.models.Photo
+import com.example.myexpirationdate.viewmodels.CameraVM
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.InputStream
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import java.util.Locale
+import coil3.compose.AsyncImage
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PhotoGridScreen(photos: List<com.example.myexpirationdate.models.Photo>, modifier: Modifier = Modifier) {
-    val cameraVM = viewModel<com.example.myexpirationdate.viewmodels.CameraVM>()
+fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
+    val cameraVM = viewModel<CameraVM>()
     val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -45,39 +56,37 @@ fun PhotoGridScreen(photos: List<com.example.myexpirationdate.models.Photo>, mod
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(photos) { photo ->
-                    val bitmapState = produceState<Bitmap?>(initialValue = null, photo.imagePath) {
-                        val path = photo.imagePath
-                        value = try {
-                            if (path?.startsWith("http", ignoreCase = true) == true) {
-                                withContext(Dispatchers.IO) {
-                                    downloadBitmapFromUrl(path)
-                                }
-                            } else if (path != null) {
-                                BitmapFactory.decodeFile(path)
-                            } else {
-                                null
-                            }
-                        } catch (_: Exception) {
-                            null
-                        }
-                    }
 
-
-                    Box(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .aspectRatio(1f),
-                        contentAlignment = Alignment.Center
+                    Card(
+                        modifier = Modifier.padding(4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
-                        val bmp = bitmapState.value
-                        if (bmp != null) {
-                            Image(
-                                bitmap = bmp.asImageBitmap(),
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            AsyncImage(
+                                model = photo.imagePath,
                                 contentDescription = "Captured photo: ${photo.name}",
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1f),
+                                contentScale = ContentScale.Crop
                             )
-                        } else {
-                            Text("Image not available" )
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            ) {
+                                Text(
+                                    text = photo.name,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "Expiration date here",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
@@ -99,21 +108,5 @@ fun PhotoGridScreen(photos: List<com.example.myexpirationdate.models.Photo>, mod
             Spacer(modifier = Modifier.width(8.dp))
             Text("Delete All Photos")
         }
-    }
-}
-
-private fun downloadBitmapFromUrl(url: String): Bitmap? {
-    return try {
-        val client = OkHttpClient()
-        val request = Request.Builder().url(url).build()
-        client.newCall(request).execute().use { resp ->
-            if (!resp.isSuccessful) return null
-            val stream: InputStream? = resp.body?.byteStream()
-            stream?.use {
-                BitmapFactory.decodeStream(it)
-            }
-        }
-    } catch (e: Exception) {
-        null
     }
 }

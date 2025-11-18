@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -77,7 +76,7 @@ class OpenAiVM(private val expirationItemDao: ExpirationItemDao) : ViewModel() {
             .split("\\s+".toRegex())
             .filter { it.length >= 3 && it !in stopWords }
 
-        Log.d(TAG, "Normalized keywords: $words")
+//        Log.d(TAG, "Normalized keywords: $words")
         return words.toSet().toList()
     }
 
@@ -88,8 +87,8 @@ class OpenAiVM(private val expirationItemDao: ExpirationItemDao) : ViewModel() {
                 return@withContext emptyList()
             }
 
-            val allItems = expirationItemDao.getAllExpirationItems().first()
-            Log.d(TAG, "Database contains ${allItems.size} items: ${allItems.map { it.name }}")
+//            val allItems = expirationItemDao.getAllExpirationItems().first()
+//            Log.d(TAG, "Database contains ${allItems.size} items: ${allItems.map { it.name }}")
 
             val queryBuilder = StringBuilder("SELECT * FROM expiration_items WHERE ")
             val bindArgs = mutableListOf<Any>()
@@ -115,9 +114,9 @@ class OpenAiVM(private val expirationItemDao: ExpirationItemDao) : ViewModel() {
 
             try {
                 val results = expirationItemDao.getItemsByQuery(query)
-                Log.d(TAG, "Keywords searched: $keywords")
-                Log.d(TAG, "SQL query: ${queryBuilder.toString()}")
-                Log.d(TAG, "Bind args: $bindArgs")
+//                Log.d(TAG, "Keywords searched: $keywords")
+//                Log.d(TAG, "SQL query: ${queryBuilder.toString()}")
+//                Log.d(TAG, "Bind args: $bindArgs")
                 Log.d(
                     TAG,
                     "Found ${results.size} matching expiration items: ${results.map { it.name }}"

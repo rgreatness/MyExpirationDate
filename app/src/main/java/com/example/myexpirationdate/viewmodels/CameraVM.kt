@@ -11,16 +11,12 @@ import com.example.myexpirationdate.data.PhotoDao
 import com.example.myexpirationdate.models.Photo
 import com.example.myexpirationdate.repos.ImageRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.coroutines.cancellation.CancellationException
 
 class CameraVM(application: Application) : AndroidViewModel(application) {
-
-    private val _photos = MutableStateFlow<List<Photo>>(emptyList())
-    val photos: StateFlow<List<Photo>> = _photos
 
     private val photoDao: PhotoDao by lazy {
         RoomVM.getInstance().photoDao
@@ -30,25 +26,12 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
         getApplication<Application>().applicationContext
     }
 
-    init {
-        loadPhotos()
-    }
-
-    private fun loadPhotos() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                photoDao.getAllPhotos().collect { photoList ->
-                    _photos.update { photoList }
-                    Log.d(TAG, "Loaded ${photoList.size} photos from database")
-                }
-            } catch (e: CancellationException) {
-                Log.d(TAG, "Photo loading cancelled")
-                throw e
-            } catch (e: Exception) {
-                Log.e(TAG, "Error loading photos", e)
-            }
-        }
-    }
+    val photos: StateFlow<List<Photo>> = photoDao.getAllPhotos()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     fun onTakePhoto(bitmap: Bitmap) {
         Log.i(TAG, "Photo taken, processing upload")
@@ -58,7 +41,7 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
 
                 if (remoteUrl != null) {
                     val photo = Photo(
-                        name = "Photo ${_photos.value.size + 1}",
+                        name = "Photo ${photos.value.size + 1}",
                         imagePath = remoteUrl
                     )
                     photoDao.upsertPhoto(photo)
@@ -71,9 +54,6 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-
-
-
 
     fun clearAllPhotos() {
         viewModelScope.launch(Dispatchers.IO) {
