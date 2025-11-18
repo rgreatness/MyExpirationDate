@@ -24,9 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myexpirationdate.data.MyDatabase
 import com.example.myexpirationdate.models.Photo
-import com.example.myexpirationdate.screens.ExpirationListScreen
 import com.example.myexpirationdate.ui.theme.MyExpirationDateTheme
 import com.example.myexpirationdate.viewmodels.CameraVM
 import com.example.myexpirationdate.viewmodels.OpenAiVM
@@ -62,9 +60,6 @@ class MainActivity : ComponentActivity() {
                             openAiVM = openAiVM
                         )
                     }
-                    composable("expiration_list_screen") {
-                        ExpirationListScreen()
-                    }
                 }
             }
         }
@@ -89,7 +84,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Home", "Photos", "Expirations")
+    val tabs = listOf("Home", "Photos")
 
     Scaffold(
         bottomBar = {
@@ -119,7 +114,6 @@ fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM) {
             when (selectedTab) {
                 0 -> HomeScreen(cameraVM, openAiVM)
                 1 -> PhotoGridScreen(photos = photos)
-                2 -> ExpirationListScreen()
                 else -> {
                 }
             }

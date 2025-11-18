@@ -64,15 +64,45 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         if (analysisResult.isNotEmpty()) {
-            Text(
-                text = analysisResult,
-                style = typography.bodyLarge,
-                modifier = Modifier.padding(16.dp)
-            )
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Product Analysis",
+                    style = typography.titleLarge,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Name: ${parseField(analysisResult, "name")}",
+                    style = typography.bodyLarge
+                )
+                Text(
+                    text = "Acceptable Date: ${parseField(analysisResult, "acceptableDate")}",
+                    style = typography.bodyLarge
+                )
+                Text(
+                    text = "Donatable: ${parseField(analysisResult, "donatable")}",
+                    style = typography.bodyLarge
+                )
+            }
         }
 
     }
 }
 
+private fun parseField(result: String, field: String): String {
+    return try {
+        val regex = when (field) {
+            "name" -> """(?:name|product)[:\s]*([^\n,]+)""".toRegex(RegexOption.IGNORE_CASE)
+            "acceptableDate" -> """(?:acceptable[_\s]?date|expir(?:ation|y)[_\s]?date)[:\s]*([^\n,]+)""".toRegex(RegexOption.IGNORE_CASE)
+            "donatable" -> """(?:donatable|can[_\s]?donate)[:\s]*(yes|no|true|false)""".toRegex(RegexOption.IGNORE_CASE)
+            else -> return "N/A"
+        }
+        regex.find(result)?.groupValues?.get(1)?.trim() ?: "N/A"
+    } catch (e: Exception) {
+        "N/A"
+    }
+}
 
 
