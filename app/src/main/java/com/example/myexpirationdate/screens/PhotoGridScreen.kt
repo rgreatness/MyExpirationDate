@@ -1,7 +1,6 @@
 package com.example.myexpirationdate.screens
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
@@ -20,17 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myexpirationdate.models.Photo
 import com.example.myexpirationdate.viewmodels.CameraVM
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import java.io.InputStream
-import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.util.Locale
 import coil3.compose.AsyncImage
 
 @RequiresApi(Build.VERSION_CODES.O)

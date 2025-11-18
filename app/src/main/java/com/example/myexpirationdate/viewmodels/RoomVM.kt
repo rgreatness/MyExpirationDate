@@ -103,18 +103,6 @@ class RoomVM(
         }
     }
 
-    fun deletePhoto(photo: Photo) {
-        viewModelScope.launch {
-            photoDao.deletePhoto(photo)
-        }
-    }
-
-    fun addPhoto() {
-        viewModelScope.launch {
-            photoDao.upsertPhoto(photo_state.toPhoto())
-        }
-    }
-
     companion object {
         private var INSTANCE: RoomVM? = null
 
