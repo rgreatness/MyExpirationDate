@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -23,15 +24,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myexpirationdate.data.MyDatabase
 import com.example.myexpirationdate.models.Photo
 import com.example.myexpirationdate.screens.ExpirationListScreen
 import com.example.myexpirationdate.ui.theme.MyExpirationDateTheme
 import com.example.myexpirationdate.viewmodels.CameraVM
+import com.example.myexpirationdate.viewmodels.OpenAiVM
+import com.example.myexpirationdate.viewmodels.OpenAiVMFactory
+import kotlin.getValue
+
 
 val TAG = "MY_TAG"
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
+    private val openAiVM: OpenAiVM by viewModels {
+        OpenAiVMFactory()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!hasRequiredPermissions()) {
@@ -49,6 +59,7 @@ class MainActivity : ComponentActivity() {
                         MainScreen(
                             photos = photos,
                             cameraVM = cameraVM,
+                            openAiVM = openAiVM
                         )
                     }
                     composable("expiration_list_screen") {
@@ -76,7 +87,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(photos: List<Photo>, cameraVM: CameraVM) {
+fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Home", "Photos", "Expirations")
 
@@ -106,7 +117,7 @@ fun MainScreen(photos: List<Photo>, cameraVM: CameraVM) {
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             when (selectedTab) {
-                0 -> HomeScreen(cameraVM)
+                0 -> HomeScreen(cameraVM, openAiVM)
                 1 -> PhotoGridScreen(photos = photos)
                 2 -> ExpirationListScreen()
                 else -> {

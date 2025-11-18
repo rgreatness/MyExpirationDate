@@ -36,7 +36,7 @@ fun ExpirationItemCard(item: ExpirationItem) {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = item.product_name,
+                text = item.name,
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(4.dp))
@@ -44,10 +44,15 @@ fun ExpirationItemCard(item: ExpirationItem) {
                 text = "ID: ${item.id}",
                 style = MaterialTheme.typography.bodySmall
             )
-            Text(
-                text = "Expires in: ${item.acceptableXdate.months} months, ${item.acceptableXdate.days} days",
-                style = MaterialTheme.typography.bodyMedium
-            )
+
+            // Display all acceptable expiration dates
+            item.acceptableXdate.forEachIndexed { index, xdate ->
+                Text(
+                    text = "Expires in: ${xdate.months} months, ${xdate.days} days",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
             Text(
                 text = "Donatable: ${if (item.isDonateable) "Yes" else "No"}",
                 style = MaterialTheme.typography.bodySmall
