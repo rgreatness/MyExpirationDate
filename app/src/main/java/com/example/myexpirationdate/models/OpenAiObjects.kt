@@ -17,7 +17,6 @@ data class ContentItem(
     val imageUrl: URLObject? = null
 )
 
-// Request-side message: content is an array for multimodal input
 @Serializable
 data class MessageRequest(
     val role: String,
@@ -31,7 +30,6 @@ data class ChatRequest(
     val temperature: Double? = null
 )
 
-// Response-side message: content is a plain string
 @Serializable
 data class ChatMessageResponse(
     val role: String,
