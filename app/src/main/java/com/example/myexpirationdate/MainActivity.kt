@@ -24,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myexpirationdate.models.Photo
+import com.example.myexpirationdate.screens.MapScreen
 import com.example.myexpirationdate.screens.PhotoGridScreen
 import com.example.myexpirationdate.ui.theme.MyExpirationDateTheme
 import com.example.myexpirationdate.viewmodels.CameraVM
@@ -84,7 +85,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Home", "Photos")
+    val tabs = listOf("Home", "Photos", "Map")
 
     Scaffold(
         bottomBar = {
@@ -99,7 +100,7 @@ fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM) {
                                 imageVector = when (index) {
                                     0 -> Icons.Default.Home
                                     1 -> Icons.Default.PhotoLibrary
-                                    2 -> Icons.AutoMirrored.Filled.List
+                                    2 -> Icons.Default.Map
                                     else -> Icons.Default.Home
                                 },
                                 contentDescription = title
@@ -114,10 +115,13 @@ fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM) {
             when (selectedTab) {
                 0 -> HomeScreen(cameraVM, openAiVM)
                 1 -> PhotoGridScreen(photos = photos)
+                2 -> MapScreen(41.1540195, -80.0956471)
                 else -> {
                 }
             }
         }
     }
 }
+
+//used Gemini to generate logo
 

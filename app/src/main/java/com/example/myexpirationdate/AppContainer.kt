@@ -20,7 +20,7 @@ class DefaultAppContainer(context: Context) : AppContainer {
             context,
             MyDatabase::class.java,
             "your_database_name"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     override val photoDao: PhotoDao by lazy {
