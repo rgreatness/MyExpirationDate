@@ -4,9 +4,11 @@ package com.example.myexpirationdate.screens
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -40,8 +42,7 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
                 Text("No photos taken yet.")
             }
         } else {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 128.dp),
+            LazyColumn (
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(4.dp)
             ) {
@@ -54,40 +55,42 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
                         isDonatable = photo.isDonatable
                     )
 
-                    Card(
-                        modifier = Modifier.padding(4.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                    ) {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            AsyncImage(
-                                model = photo.imagePath,
-                                contentDescription = "Captured photo: ${photo.name}",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(1f),
-                                contentScale = ContentScale.Crop
-                            )
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Card(
+                            modifier = Modifier.padding(4.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                AsyncImage(
+                                    model = photo.imagePath,
+                                    contentDescription = "Captured photo: ${photo.name}",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(1f),
+                                    contentScale = ContentScale.Crop
+                                )
 
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
-                            ) {
-                                Text(
-                                    text = parsed.name,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                                Text(
-                                    text = "Expiration: ${parsed.months} months, ${parsed.days} days",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "Donatable: ${parsed.isDonatable}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp)
+                                ) {
+                                    Text(
+                                        text = parsed.name,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        text = "Expiration: ${parsed.months} months, ${parsed.days} days",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = "Donatable: ${parsed.isDonatable}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                         }
                     }
