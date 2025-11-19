@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,9 @@ fun HomeScreen(
 ) {
     val analysisResult by openAiVM.analysisResult.collectAsState()
 
+    val lastBitmap = remember { mutableStateOf<Bitmap?>(null) }
+    val saved = remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -50,8 +54,9 @@ fun HomeScreen(
         ) { result ->
             val bitmap = result.data?.extras?.get("data") as? Bitmap
             if (bitmap != null) {
-                openAiVM.analyzeImage(bitmap) // return ParsedItem
-                cameraVM.onTakePhoto(bitmap, null)
+                lastBitmap.value = bitmap
+                saved.value = false
+                openAiVM.analyzeImage(bitmap)
             } else {
                 Log.e(TAG, "No bitmap returned from camera intent")
             }
@@ -78,7 +83,14 @@ fun HomeScreen(
                 Log.d(TAG, "Analysis Result: $analysisResult")
                 val parsed = parseExpirationItem(analysisResult)
 
+
+
                 if (parsed != null) {
+                    if (lastBitmap.value != null && !saved.value) {
+                        cameraVM.onTakePhoto(lastBitmap.value!!, parsed)
+                        saved.value = true
+                    }
+
                     Text("Name: ${parsed.name}", style = typography.bodyLarge)
                     Text("Expiration: ${parsed.months} months, ${parsed.days} days", style = typography.bodyLarge)
                     Text("Donatable: ${parsed.isDonatable}", style = typography.bodyLarge)
