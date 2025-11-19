@@ -71,4 +71,36 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    fun onSaveManual(name: String, months: Int, days: Int, isDonatable: Boolean, photo: Bitmap?) {
+        Log.i(TAG, "Saving manual entry: $name, $months months, $days days, Donatable: $isDonatable")
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                var imagePath: String = ""
+
+                if (photo != null) {
+                    val remoteUrl = ImageRepository.uploadAndSave(context, photo)
+                    if (remoteUrl != null) {
+                        imagePath = remoteUrl
+                    } else {
+                        Log.e(TAG, "Failed to upload manual photo to ImgBB - no URL returned")
+                    }
+                } else {
+                    Log.w(TAG, "No photo provided for manual save - inserting record without image")
+                }
+
+                val newPhoto = Photo(
+                    name = name,
+                    imagePath = imagePath,
+                    acceptableXdate = AcceptableXdate(months, days),
+                    isDonatable = isDonatable
+                )
+                photoDao.upsertPhoto(newPhoto)
+                Log.i(TAG, "Manual photo saved with imagePath: $imagePath")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error saving manual entry", e)
+            }
+        }
+    }
+
 }

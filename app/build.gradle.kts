@@ -55,6 +55,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
     implementation(libs.identity.jvm)
     implementation(libs.androidx.adapters)
+    implementation(libs.androidx.material3)
 
     // add room library
     val room_version = "2.8.3"
