@@ -1,13 +1,14 @@
 package com.example.myexpirationdate
 
-import HomeScreen
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -24,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myexpirationdate.models.Photo
+import com.example.myexpirationdate.screens.HomeScreen
 import com.example.myexpirationdate.screens.MapScreen
 import com.example.myexpirationdate.screens.PhotoGridScreen
 import com.example.myexpirationdate.ui.theme.MyExpirationDateTheme
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
         OpenAiVMFactory()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!hasRequiredPermissions()) {
@@ -82,6 +85,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM) {
     var selectedTab by remember { mutableStateOf(0) }
