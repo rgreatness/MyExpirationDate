@@ -49,6 +49,10 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val appContainer = (application as medApp).container as DefaultAppContainer
+        appContainer.loadExpirationItemsFromJson()
+
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
         }
@@ -151,5 +155,4 @@ object ManifestUtils {
     }
 }
 
-//used Gemini to generate logo
 

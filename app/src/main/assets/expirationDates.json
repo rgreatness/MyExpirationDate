@@ -78,5 +78,15 @@
     },
     "isDonatable": true,
     "isUnopened": false
+  },
+  {
+    "id": "5f4e2c1a-8b3d-4c6e-9f7a-1e2d3c4b5a6f",
+    "name": "CheezIts",
+    "acceptableXdate": {
+      "months": 9,
+      "days": 0
+    },
+    "isDonatable": true,
+    "isUnopened": false
   }
 ]
