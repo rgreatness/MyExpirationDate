@@ -110,6 +110,12 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
+    // maps dependency
+    implementation(libs.places)
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
+
+
 
 
 

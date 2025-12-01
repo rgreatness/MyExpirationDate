@@ -1,6 +1,7 @@
 package com.example.myexpirationdate
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -30,8 +31,10 @@ import com.example.myexpirationdate.screens.MapScreen
 import com.example.myexpirationdate.screens.PhotoGridScreen
 import com.example.myexpirationdate.ui.theme.MyExpirationDateTheme
 import com.example.myexpirationdate.viewmodels.CameraVM
+import com.example.myexpirationdate.viewmodels.MapVM
 import com.example.myexpirationdate.viewmodels.OpenAiVM
 import com.example.myexpirationdate.viewmodels.OpenAiVMFactory
+import com.google.android.libraries.places.api.Places
 import kotlin.getValue
 
 
@@ -49,19 +52,26 @@ class MainActivity : ComponentActivity() {
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
         }
+        val geoApiKey = ManifestUtils.getAPIKey(this)
+        if (!Places.isInitialized() && geoApiKey != null){
+            Places.initialize(applicationContext, geoApiKey)
+        }
+
         enableEdgeToEdge()
         setContent {
             MyExpirationDateTheme {
                 val navController = rememberNavController()
                 val cameraVM = viewModel<CameraVM>()
                 val photos by cameraVM.photos.collectAsState()
+                val mapVM = viewModel<MapVM>()
 
                 NavHost(navController = navController, startDestination = "main_screen") {
                     composable("main_screen") {
                         MainScreen(
                             photos = photos,
                             cameraVM = cameraVM,
-                            openAiVM = openAiVM
+                            openAiVM = openAiVM,
+                            mapVM = mapVM
                         )
                     }
                 }
@@ -87,7 +97,7 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM) {
+fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM, mapVM: MapVM) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Home", "Photos", "Map")
 
@@ -119,10 +129,24 @@ fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM) {
             when (selectedTab) {
                 0 -> HomeScreen(cameraVM, openAiVM)
                 1 -> PhotoGridScreen(photos = photos)
-                2 -> MapScreen(41.1540195, -80.0956471)
+                2 -> MapScreen(mapVM)
                 else -> {
                 }
             }
+        }
+    }
+}
+
+object ManifestUtils {
+    //function to retrieve api key from AndroidManifest.xml
+    fun getAPIKey(context: Context): String? {
+        return try {
+            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+            val bundle = applicationInfo.metaData
+            bundle.getString("com.google.android.geo.API_KEY")
+        }catch(e: PackageManager.NameNotFoundException){
+            e.printStackTrace()
+            null
         }
     }
 }
