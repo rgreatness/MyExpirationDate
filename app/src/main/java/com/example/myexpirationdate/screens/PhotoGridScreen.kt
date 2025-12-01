@@ -3,6 +3,9 @@ package com.example.myexpirationdate.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -16,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -52,43 +56,87 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
                         name = photo.name,
                         months = photo.acceptableXdate.months,
                         days = photo.acceptableXdate.days,
-                        isDonatable = photo.isDonatable
+                        isDonatable = photo.isDonatable,
+                    )
+
+                    var rotated by remember{mutableStateOf(false)}
+
+                    val rotation by animateFloatAsState(
+                        targetValue = if (rotated) 180f else 0f,
+                        animationSpec = tween(500)
+                    )
+
+                    val animateFront by animateFloatAsState(
+                        targetValue = if (!rotated) 1f else 0f,
+                        animationSpec = tween(500)
+                    )
+
+                    val animateBack by animateFloatAsState(
+                        targetValue = if (rotated) 1f else 0f,
+                        animationSpec = tween(500)
                     )
 
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Card(
-                            modifier = Modifier.padding(4.dp),
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .graphicsLayer{
+                                    rotationY = rotation
+                                    cameraDistance = 8 * density }
+                                .clickable{
+                                   rotated = !rotated
+                                },
                             shape = RoundedCornerShape(12.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                         ) {
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                AsyncImage(
-                                    model = photo.imagePath,
-                                    contentDescription = "Captured photo: ${photo.name}",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(1f),
-                                    contentScale = ContentScale.Crop
-                                )
-
+                            if (rotated){
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(8.dp)
+                                        .graphicsLayer{
+                                            alpha = if (rotated) animateBack else animateFront
+                                            rotationY = rotation
+                                        }
                                 ) {
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
                                     Text(
                                         text = parsed.name,
-                                        style = MaterialTheme.typography.bodyMedium
+                                        style = MaterialTheme.typography.titleLarge
                                     )
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
                                     Text(
                                         text = "Expiration: ${parsed.months} months, ${parsed.days} days",
-                                        style = MaterialTheme.typography.bodySmall,
+                                        style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
                                     Text(
                                         text = "Donatable: ${parsed.isDonatable}",
-                                        style = MaterialTheme.typography.bodySmall,
+                                        style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+
+                                    Spacer(modifier = Modifier.height(240.dp))
+                                }
+                            }else{
+                                Column(modifier = Modifier.fillMaxWidth().graphicsLayer{
+                                    alpha = if (rotated) animateBack else animateFront
+                                    rotationY = rotation
+                                }) {
+                                    AsyncImage(
+                                        model = photo.imagePath,
+                                        contentDescription = "Captured photo: ${photo.name}",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(1f),
+                                        contentScale = ContentScale.Crop
                                     )
                                 }
                             }

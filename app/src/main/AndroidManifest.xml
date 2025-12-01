@@ -11,6 +11,7 @@
 
     <!-- location services permission -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".medApp"
@@ -22,6 +23,9 @@
         android:roundIcon="@mipmap/med_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyExpirationDate">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAlX7UAVx_paxVUf1Fi_Bbn48I37BZ6t88"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
