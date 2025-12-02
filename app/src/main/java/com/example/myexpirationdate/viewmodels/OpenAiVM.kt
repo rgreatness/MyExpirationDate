@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -25,9 +26,19 @@ class OpenAiVM(private val expirationItemDao: ExpirationItemDao) : ViewModel() {
     private val _analysisResult = MutableStateFlow("")
     val analysisResult: StateFlow<String> = _analysisResult.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     fun analyzeImage(bitmap: Bitmap) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
+                val allItems = expirationItemDao.getAllExpirationItems().first()
+                Log.d(TAG, "=== DATABASE CONTENT ===")
+                Log.d(TAG, "Total items in database: ${allItems.size}")
+                allItems.forEach { item ->
+                    Log.d(TAG, "Item: ${item.name}")
+                }
                 Log.d(TAG, "Starting image analysis...")
                 val base64Image = bitmapToBase64(bitmap)
                 val dataUrl = "data:image/jpeg;base64,$base64Image"
@@ -51,6 +62,8 @@ class OpenAiVM(private val expirationItemDao: ExpirationItemDao) : ViewModel() {
             } catch (e: Throwable) {
                 Log.e(TAG, "OpenAiVM.analyzeImage error: ${e.message}", e)
                 _analysisResult.value = "Error analyzing image: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
         }
     }

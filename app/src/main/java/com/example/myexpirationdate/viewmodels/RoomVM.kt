@@ -87,14 +87,14 @@ class RoomVM(
                         expirationItemDao.insertExpirationItem(item)
                     }
 
-                    Log.d("RoomVM", "Database populated with ${jsonArray.length()} items from expirationDates.json")
+                    Log.d("MY_TAG", "Database populated with ${jsonArray.length()} items from expirationDates.json")
                 } else {
-                    Log.d("RoomVM", "Database already contains ${existingItems.size} items")
+                    Log.d("MY_TAG", "Database already contains ${existingItems.size} items")
                 }
             } catch (e: IOException) {
-                Log.e("RoomVM", "Error reading expirationDates.json: ${e.message}", e)
+                Log.e("MY_TAG", "Error reading expirationDates.json: ${e.message}", e)
             } catch (e: Exception) {
-                Log.e("RoomVM", "Error populating database: ${e.message}", e)
+                Log.e("MY_TAG", "Error populating database: ${e.message}", e)
             }
         }
     }

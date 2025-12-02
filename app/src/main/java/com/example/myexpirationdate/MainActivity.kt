@@ -12,7 +12,6 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,6 +34,7 @@ import com.example.myexpirationdate.viewmodels.MapVM
 import com.example.myexpirationdate.viewmodels.OpenAiVM
 import com.example.myexpirationdate.viewmodels.OpenAiVMFactory
 import com.google.android.libraries.places.api.Places
+import kotlinx.coroutines.runBlocking
 import kotlin.getValue
 
 
@@ -51,7 +51,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val appContainer = (application as medApp).container as DefaultAppContainer
-        appContainer.loadExpirationItemsFromJson()
+        runBlocking {
+            appContainer.loadExpirationItemsFromJson()
+        }
 
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
@@ -131,7 +133,7 @@ fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM, mapV
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             when (selectedTab) {
-                0 -> HomeScreen(cameraVM, openAiVM)
+                0 -> HomeScreen(cameraVM = cameraVM, openAiVM = openAiVM)
                 1 -> PhotoGridScreen(photos = photos)
                 2 -> MapScreen(mapVM)
                 else -> {

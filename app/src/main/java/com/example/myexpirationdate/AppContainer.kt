@@ -35,20 +35,21 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         database.expirationItemDao()
     }
 
-    fun loadExpirationItemsFromJson() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val jsonString = context.assets.open("expirationDates.json").bufferedReader().use { it.readText() }
-                val gson = Gson()
-                val itemType = object : TypeToken<List<ExpirationItem>>() {}.type
-                val items: List<ExpirationItem> = gson.fromJson(jsonString, itemType)
+    suspend fun loadExpirationItemsFromJson() {
+        try {
+            val jsonString = context.assets.open("expirationDates.json")
+                .bufferedReader()
+                .use { it.readText() }
 
-                items.forEach { item ->
-                    expirationItemDao.upsertExpirationItem(item)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            val gson = Gson()
+            val itemType = object : TypeToken<List<ExpirationItem>>() {}.type
+            val items: List<ExpirationItem> = gson.fromJson(jsonString, itemType)
+
+            expirationItemDao.deleteAll()
+            expirationItemDao.insertAll(items)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
+
 }
