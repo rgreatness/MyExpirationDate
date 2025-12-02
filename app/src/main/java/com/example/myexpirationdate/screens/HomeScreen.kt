@@ -78,9 +78,9 @@ fun HomeScreen(
     openAiVM: OpenAiVM = viewModel()
 ) {
     val analysisResult by openAiVM.analysisResult.collectAsState()
+    val isLoading by openAiVM.isLoading.collectAsState()
     val lastBitmap = remember { mutableStateOf<Bitmap?>(null) }
     val saved = remember { mutableStateOf(false) }
-    var loading by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val snackScope = rememberCoroutineScope()
@@ -119,7 +119,6 @@ fun HomeScreen(
             Button(
                 onClick = {
                     launcher.launch(takePictureIntent)
-                    loading = true
                 }
             ) {
                 Text("Open Camera")
@@ -127,7 +126,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            if (loading) {
+            if (isLoading) {
                 val infiniteTransition = rememberInfiniteTransition()
                 val angle by infiniteTransition.animateFloat(
                     initialValue = 0f,
@@ -151,7 +150,6 @@ fun HomeScreen(
             }
 
             if (analysisResult.isNotEmpty() && !showManualEntryDialog) {
-                loading = false
 
                 Column(
                     modifier = Modifier.padding(16.dp),

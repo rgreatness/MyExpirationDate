@@ -42,8 +42,14 @@ interface ExpirationItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertExpirationItem(item: ExpirationItem)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(items: List<ExpirationItem>)
+
     @Delete
     suspend fun deleteExpirationItem(item: ExpirationItem)
+
+    @Query("DELETE FROM expiration_items")
+    suspend fun deleteAll()
 
     @RawQuery(observedEntities = [ExpirationItem::class])
     fun getItemsByQuery(query: SupportSQLiteQuery): List<ExpirationItem>
