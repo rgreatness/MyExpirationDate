@@ -29,6 +29,10 @@ interface PhotoDao {
 
     @Delete
     suspend fun deletePhoto(photo: Photo)
+
+
+    @Query("SELECT * FROM photo WHERE hash = :hash LIMIT 1")
+    suspend fun getPhotoByHash(hash: String): Photo?
 }
 
 @Dao
