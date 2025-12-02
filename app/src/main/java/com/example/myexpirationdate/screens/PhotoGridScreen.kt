@@ -8,14 +8,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -104,23 +104,30 @@ fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
 
                                     Text(
                                         text = parsed.name,
-                                        style = MaterialTheme.typography.titleLarge
+                                        style = typography.titleLarge
                                     )
 
                                     Spacer(modifier = Modifier.height(20.dp))
 
                                     Text(
-                                        text = "Expiration: ${parsed.months} months, ${parsed.days} days",
-                                        style = MaterialTheme.typography.titleMedium,
+                                        text = cameraVM.formatMonthsToYearsMonthsDays(parsed.months, parsed.days),
+                                        style = typography.titleMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
 
                                     Spacer(modifier = Modifier.height(20.dp))
 
-                                    Text(
-                                        text = "Donatable: ${parsed.isDonatable}",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    Text("Donatable", style = typography.bodyLarge)
+                                    AssistChip(
+                                        onClick = {},
+                                        label = { Text(if (parsed.isDonatable) "Yes" else "No") },
+                                        leadingIcon = {
+                                            Icon(
+                                                if (parsed.isDonatable) Icons.Default.Check
+                                                else Icons.Default.Close,
+                                                contentDescription = null
+                                            )
+                                        }
                                     )
 
                                     Spacer(modifier = Modifier.height(240.dp))

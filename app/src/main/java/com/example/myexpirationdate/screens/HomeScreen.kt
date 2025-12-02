@@ -42,7 +42,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.shapes
@@ -84,7 +84,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
-import kotlin.text.get
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -188,8 +187,8 @@ fun HomeScreen(
                             cameraVM.onTakePhoto(lastBitmap!!, parsed)
                             saved.value = true
                         }
-                        Log.d(TAG, "Raw Analysis Result: $analysisResult")
-                        Log.d(TAG, "Parsed isDonatable: ${parsed?.isDonatable}")
+//                        Log.d(TAG, "Raw Analysis Result: $analysisResult")
+//                        Log.d(TAG, "Parsed isDonatable: ${parsed?.isDonatable}")
 
 
                         AnimatedVisibility(visible = true, enter = fadeIn(tween(500))) {
@@ -240,13 +239,13 @@ fun HomeScreen(
                                             Column {
                                                 Text(parsed.name, style = typography.titleLarge)
                                                 Text(
-                                                    "Expires in: ${parsed.months}m ${parsed.days}d",
+                                                    cameraVM.formatMonthsToYearsMonthsDays(parsed.months, parsed.days),
                                                     style = typography.bodyMedium
                                                 )
                                             }
                                         }
 
-                                        Divider()
+                                        HorizontalDivider()
 
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,

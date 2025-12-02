@@ -1,4 +1,3 @@
-// kotlin
 package com.example.myexpirationdate.viewmodels
 
 import android.app.Application
@@ -38,7 +37,7 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
             initialValue = emptyList()
         )
 
-    // In-memory cache of hashes we've already processed (populated from DB)
+    // keep track of photo hashes
     private val processedHashes = mutableSetOf<String>()
 
     init {
@@ -69,13 +68,13 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
             try {
                 val hash = bitmapHash(bitmap)
 
-                // Fast in-memory guard (survives composable navigation) before hitting DAO
+
                 if (processedHashes.contains(hash)) {
                     Log.i(TAG, "Duplicate detected in-memory (hash=${hash.take(8)}...), skipping")
                     return@launch
                 }
 
-                // Double-check against DB (defensive)
+                // Double-check against DB
                 val existing = try { photoDao.getPhotoByHash(hash) } catch (e: Exception) { null }
                 if (existing != null) {
                     Log.i(TAG, "Duplicate detected in DB (hash=${hash.take(8)}...), skipping")
@@ -95,7 +94,7 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
                         hash = hash
                     )
                     photoDao.upsertPhoto(photo)
-                    // mark processed so subsequent navigations won't re-save
+                    // mark processed so navigation won't re-save photos
                     processedHashes.add(hash)
                     Log.i(TAG, "Photo saved with remote URL: $remoteUrl")
                 } else {
@@ -119,11 +118,27 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun formatMonthsToYearsMonthsDays(months: Int, days: Int): String {
+        if (months <= 0 && days <= 0) return "Expiration: 0 days"
+
+        val years = months / 12
+        val remMonths = months % 12
+
+        val parts = mutableListOf<String>()
+
+        if (years > 0) parts.add("$years ${if (years == 1) "year" else "years"}")
+        if (remMonths > 0) parts.add("$remMonths ${if (remMonths == 1) "month" else "months"}")
+        if (days > 0) parts.add("$days ${if (days == 1) "day" else "days"}")
+
+        return "Expiration: ${parts.joinToString(", ")}"
+    }
+
+
     fun onSaveManual(name: String, months: Int, days: Int, isDonatable: Boolean, photo: Bitmap?) {
         Log.i(TAG, "Saving manual entry: $name, $months months, $days days, Donatable: $isDonatable")
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                var imagePath: String = ""
+                var imagePath = ""
                 var hash: String? = null
 
                 if (photo != null) {
