@@ -80,6 +80,11 @@ class OpenAiVM(private val expirationItemDao: ExpirationItemDao) : ViewModel() {
         return words.toSet().toList()
     }
 
+    fun clearAnalysisResult() {
+        _analysisResult.value = ""
+    }
+
+
 
     private suspend fun checkExpItems(keywords: List<String>): List<ExpirationItem> {
         return withContext(Dispatchers.IO) {
