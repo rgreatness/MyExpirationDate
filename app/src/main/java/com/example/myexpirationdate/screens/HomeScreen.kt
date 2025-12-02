@@ -84,6 +84,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
+import kotlin.text.get
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -95,8 +96,9 @@ fun HomeScreen(
 ) {
     val analysisResult by openAiVM.analysisResult.collectAsState()
     val isLoading by openAiVM.isLoading.collectAsState()
-    val lastBitmap = remember { mutableStateOf<Bitmap?>(null) }
+    val lastBitmap by openAiVM.lastBitmap.collectAsState()
     val saved = remember { mutableStateOf(false) }
+    val dialogDismissed = remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val snackScope = rememberCoroutineScope()
@@ -123,13 +125,14 @@ fun HomeScreen(
             ) { result ->
                 val bitmap = result.data?.extras?.get("data") as? Bitmap
                 if (bitmap != null) {
-                    lastBitmap.value = bitmap
+                    openAiVM.setBitmap(bitmap)
                     saved.value = false
                     openAiVM.analyzeImage(bitmap)
                 } else {
                     Log.e(TAG, "No bitmap returned from camera intent")
                 }
             }
+
 
             val takePictureIntent = remember { Intent(MediaStore.ACTION_IMAGE_CAPTURE) }
             Button(
@@ -181,10 +184,13 @@ fun HomeScreen(
 
                     if (parsed != null) {
 
-                        if (lastBitmap.value != null && !saved.value) {
-                            cameraVM.onTakePhoto(lastBitmap.value!!, parsed)
+                        if (lastBitmap != null && !saved.value) {
+                            cameraVM.onTakePhoto(lastBitmap!!, parsed)
                             saved.value = true
                         }
+                        Log.d(TAG, "Raw Analysis Result: $analysisResult")
+                        Log.d(TAG, "Parsed isDonatable: ${parsed?.isDonatable}")
+
 
                         AnimatedVisibility(visible = true, enter = fadeIn(tween(500))) {
                             Card(
@@ -218,7 +224,7 @@ fun HomeScreen(
                                     ) {
 
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            lastBitmap.value?.let { bmp ->
+                                            lastBitmap?.let { bmp ->
                                                 Image(
                                                     bitmap = bmp.asImageBitmap(),
                                                     contentDescription = null,
@@ -265,14 +271,14 @@ fun HomeScreen(
                             }
 
                         }
-                    }
-
-                    // No match found
-                        if (!saved.value) {
+                    } else {
+                        // No match found
+                        if (!saved.value && !dialogDismissed.value) {
                             showManualEntryDialog = true
                         }
                     }
                 }
+            }
 
 
             // Show manual entry dialog when no match is found
@@ -280,11 +286,13 @@ fun HomeScreen(
                 AddItemDialog(
                     onDismissRequest = {
                         showManualEntryDialog = false
+                        dialogDismissed.value = true
                         openAiVM.clearAnalysisResult()
                     },
                     onSave = { name, months, days, isDonatable ->
-                        cameraVM.onSaveManual(name, months, days, isDonatable, lastBitmap.value)
+                        cameraVM.onSaveManual(name, months, days, isDonatable, lastBitmap)
                         saved.value = true
+                        dialogDismissed.value = true
                         showManualEntryDialog = false
                         openAiVM.clearAnalysisResult()
 
