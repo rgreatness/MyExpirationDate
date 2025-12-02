@@ -52,7 +52,7 @@ class OpenAiVM(private val expirationItemDao: ExpirationItemDao) : ViewModel() {
                 val dataUrl = "data:image/jpeg;base64,$base64Image"
 
                 val response = OpenAiApi.getImageResponse(
-                    prompt = "Please identify the food items in this image. If the object is edible (like chocolate, candy, fruit, etc.), tell me what food it appears to be.",
+                    prompt = "Please identify the food items in this image. ",
                     imageUrl = dataUrl
                 )
 
