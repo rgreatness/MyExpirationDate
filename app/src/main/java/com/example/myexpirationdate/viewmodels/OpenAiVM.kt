@@ -29,6 +29,14 @@ class OpenAiVM(private val expirationItemDao: ExpirationItemDao) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _lastBitmap = MutableStateFlow<Bitmap?>(null)
+    val lastBitmap: StateFlow<Bitmap?> = _lastBitmap.asStateFlow()
+
+    fun setBitmap(bitmap: Bitmap?) {
+        _lastBitmap.value = bitmap
+    }
+
+
     fun analyzeImage(bitmap: Bitmap) {
         viewModelScope.launch {
             _isLoading.value = true
