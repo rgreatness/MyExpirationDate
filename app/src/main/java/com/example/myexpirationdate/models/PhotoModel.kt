@@ -2,9 +2,7 @@ package com.example.myexpirationdate.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.google.gson.Gson
 
 @Entity(tableName = "photo")
 @TypeConverters(Converters::class)
