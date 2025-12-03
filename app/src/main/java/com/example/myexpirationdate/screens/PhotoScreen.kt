@@ -31,7 +31,7 @@ import com.example.myexpirationdate.models.ParsedItem
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PhotoGridScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
+fun PhotoScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
     val cameraVM = viewModel<CameraVM>()
     val coroutineScope = rememberCoroutineScope()
 

@@ -27,7 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myexpirationdate.models.Photo
 import com.example.myexpirationdate.screens.HomeScreen
 import com.example.myexpirationdate.screens.MapScreen
-import com.example.myexpirationdate.screens.PhotoGridScreen
+import com.example.myexpirationdate.screens.PhotoScreen
 import com.example.myexpirationdate.ui.theme.MyExpirationDateTheme
 import com.example.myexpirationdate.viewmodels.CameraVM
 import com.example.myexpirationdate.viewmodels.MapVM
@@ -134,7 +134,7 @@ fun MainScreen(photos: List<Photo>, cameraVM: CameraVM, openAiVM: OpenAiVM, mapV
         Box(modifier = Modifier.padding(paddingValues)) {
             when (selectedTab) {
                 0 -> HomeScreen(cameraVM = cameraVM, openAiVM = openAiVM)
-                1 -> PhotoGridScreen(photos = photos)
+                1 -> PhotoScreen(photos = photos)
                 2 -> MapScreen(mapVM)
                 else -> {
                 }

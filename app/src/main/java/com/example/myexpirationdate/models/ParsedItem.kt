@@ -1,9 +1,7 @@
 package com.example.myexpirationdate.models
 
 import android.util.Log
-import androidx.room.TypeConverter
 import com.example.myexpirationdate.TAG
-import com.google.gson.Gson
 
 data class ParsedItem(
     val name: String,
