@@ -118,6 +118,18 @@ class CameraVM(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun clearOnePhoto(photo: Photo) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                photoDao.deletePhoto(photo)
+                processedHashes.clear()
+                Log.d(TAG, "Photo cleared")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error clearing photo", e)
+            }
+        }
+    }
+
     fun formatMonthsToYearsMonthsDays(months: Int, days: Int): String {
         if (months <= 0 && days <= 0) return "Expiration: 0 days"
 

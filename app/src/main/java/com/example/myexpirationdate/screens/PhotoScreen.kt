@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myexpirationdate.models.Photo
@@ -97,17 +99,23 @@ fun PhotoScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
                                         .graphicsLayer{
                                             alpha = if (rotated) animateBack else animateFront
                                             rotationY = rotation
-                                        }
+                                        },
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
 
                                     Spacer(modifier = Modifier.height(20.dp))
 
                                     Text(
                                         text = parsed.name,
-                                        style = typography.titleLarge
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.padding(top = 10.dp),
+                                        style = typography.headlineMedium,
+                                        color = MaterialTheme.colorScheme.primary
                                     )
 
-                                    Spacer(modifier = Modifier.height(20.dp))
+                                    HorizontalDivider()
+
+                                    Spacer(modifier = Modifier.height(30.dp))
 
                                     Text(
                                         text = cameraVM.formatMonthsToYearsMonthsDays(parsed.months, parsed.days),
@@ -117,20 +125,27 @@ fun PhotoScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
 
                                     Spacer(modifier = Modifier.height(20.dp))
 
-                                    Text("Donatable", style = typography.bodyLarge)
-                                    AssistChip(
-                                        onClick = {},
-                                        label = { Text(if (parsed.isDonatable) "Yes" else "No") },
-                                        leadingIcon = {
-                                            Icon(
-                                                if (parsed.isDonatable) Icons.Default.Check
-                                                else Icons.Default.Close,
-                                                contentDescription = null
-                                            )
-                                        }
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                    ) {
+                                        Text("Donatable", style = typography.titleMedium)
+                                        AssistChip(
+                                            onClick = {},
+                                            label = { Text(if (parsed.isDonatable) "Yes" else "No") },
+                                            leadingIcon = {
+                                                Icon(
+                                                    if (parsed.isDonatable) Icons.Default.Check
+                                                    else Icons.Default.Close,
+                                                    contentDescription = null
+                                                )
+                                            }
+                                        )
+                                    }
 
-                                    Spacer(modifier = Modifier.height(240.dp))
+                                    Spacer(modifier = Modifier.height(190.dp))
+
                                 }
                             }else{
                                 Column(modifier = Modifier.fillMaxWidth().graphicsLayer{
@@ -145,6 +160,22 @@ fun PhotoScreen(photos: List<Photo>, modifier: Modifier = Modifier) {
                                             .aspectRatio(1f),
                                         contentScale = ContentScale.Crop
                                     )
+
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        Button(
+                                            onClick = {
+                                                coroutineScope.launch {
+                                                    cameraVM.clearOnePhoto(photo)
+                                                }
+                                            }
+                                        ) {
+                                            Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                                        }
+                                    }
                                 }
                             }
                         }
