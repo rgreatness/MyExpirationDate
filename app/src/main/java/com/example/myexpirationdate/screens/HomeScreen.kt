@@ -155,7 +155,7 @@ fun HomeScreen(
                 )
 
                 AsyncImage(
-                    model = R.drawable.refresh_24dp_1f1f1f_fill0_wght400_grad0_opsz24,
+                    model = R.drawable.colored_refresh_symbol,
                     contentDescription = "loading symbol",
                     modifier = Modifier
                         .fillMaxWidth()

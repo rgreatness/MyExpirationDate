@@ -110,12 +110,6 @@ fun MapScreen(mapVM: MapVM, modifier: Modifier = Modifier) {
                         state = rememberMarkerState(position = location.latLng),
                         title = location.name,
                         icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
-                        onInfoWindowClick = { it ->
-                            it.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                        },
-                        onInfoWindowClose = {
-                            it.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-                        }
                     ){
                         FoodBankWindow(location)
                     }
@@ -142,7 +136,7 @@ fun FoodBankWindow(loc: Place, modifier: Modifier = Modifier){
                 text = loc.name!!,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 10.dp),
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary
             )
 
@@ -152,18 +146,18 @@ fun FoodBankWindow(loc: Place, modifier: Modifier = Modifier){
                 text = loc.address!!,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 10.dp),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary
+                style = MaterialTheme.typography.titleLarge
             )
 
-            for (text in loc.openingHours!!.weekdayText){
-                Text(
-                    text = text,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 10.dp),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
+            if(loc.openingHours?.weekdayText != null){
+                for (text in loc.openingHours!!.weekdayText){
+                    Text(
+                        text = text,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 10.dp),
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
             }
 
         }
